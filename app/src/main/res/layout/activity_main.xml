@@ -6,32 +6,11 @@
               android:orientation="vertical"
               tools:context="com.example.budgettracker.MainActivity">
 
-
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                   xmlns:tools="http://schemas.android.com/tools"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:layout_marginTop="20dp"
-                  android:layout_marginBottom="20dp"
-                  android:gravity="center"
-                  android:orientation="horizontal">
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="Current Balance: $ " />
-
-        <TextView
-                android:id="@+id/txtBalance"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0.00" />
-    </LinearLayout>
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  xmlns:tools="http://schemas.android.com/tools"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
                   android:gravity="center"
                   android:orientation="horizontal">
 
@@ -60,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/txtActivity"
                 android:layout_marginRight="10dp"
-                android:hint = "Activity"/>
+                android:hint = "Category"/>
 
         <Button
                 android:layout_width="30dp"
@@ -79,6 +58,27 @@
 
     </LinearLayout>
 
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:tools="http://schemas.android.com/tools"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="20dp"
+                  android:gravity="center"
+                  android:orientation="horizontal">
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Current Balance: $ " />
+
+        <TextView
+                android:id="@+id/txtBalance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.00" />
+    </LinearLayout>
+
+
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -90,28 +90,75 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text=" History " />
+                android:text=" Transaction History " />
 
     </LinearLayout>
 
-    <LinearLayout
+    <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:layout_marginTop="20dp">
+            android:layout_height="match_parent"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:scrollbarStyle="outsideInset"
+            android:fillViewport="true"
+            android:scrollbars="horizontal|vertical">
 
-        <TextView
+        <TableLayout
                 android:layout_width="350dp"
-                android:layout_height= "400dp"
-                android:background="@drawable/back"
-                android:gravity="top|left"
-                android:id="@+id/txtHistory"
-                android:text= ""/>
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:id="@+id/table_main" >
 
-    </LinearLayout>
+            <TableRow
+                    android:background="@drawable/back"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                <TextView
+                        android:background="@drawable/back"
+                        android:layout_width="100dp"
+                        android:layout_height="match_parent"
+                        android:text="Date"
+                        android:gravity="center"
+                    />
+                <TextView
+                        android:background="@drawable/back"
+                        android:layout_width="80dp"
+                        android:layout_height="match_parent"
+                        android:text="Amount"
+                        android:gravity="center"
+
+                />
+                <TextView
+                        android:background="@drawable/back"
+                        android:layout_width="170dp"
+                        android:layout_height="wrap_content"
+                        android:text="Category"
+                        android:gravity="center"
+                />
+            </TableRow>
+
+        </TableLayout>
+
+    </ScrollView>
+
+<!--    <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:paddingLeft="10dp"-->
+<!--            android:paddingRight="10dp"-->
+<!--            android:gravity="center"-->
+<!--            android:orientation="horizontal"-->
+<!--            android:layout_marginTop="20dp">-->
+
+<!--        <TextView-->
+<!--                android:layout_width="350dp"-->
+<!--                android:layout_height= "400dp"-->
+<!--                android:background="@drawable/back"-->
+<!--                android:gravity="top|left"-->
+<!--                android:id="@+id/txtHistory"-->
+<!--                android:text= ""/>-->
+
+<!--    </LinearLayout>-->
 
 
 </LinearLayout>

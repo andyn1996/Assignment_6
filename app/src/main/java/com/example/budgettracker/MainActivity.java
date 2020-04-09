@@ -5,10 +5,15 @@ import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
 import android.icu.text.DecimalFormat;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.os.Build;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.*;
@@ -16,6 +21,8 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 
 
@@ -29,9 +36,12 @@ public class MainActivity extends AppCompatActivity {
     private Button btnPlus, btnMinus;
     private double balance;
     private String textBal, textHis;
-    public static final String SHARED_PREFS = "sharedPrefs";
-    public static final String TEXT_HISTORY = "textHistory";
-    public static final String TEXT_BALANCE = "textBalance";
+    private TableLayout transTable;
+    private LayoutInflater layoutInflater;
+    private int idCounter = 0;
+    public DataBaseHelper myDB;
+    //private static String filePath = "transaction.db";
+
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -43,12 +53,14 @@ public class MainActivity extends AppCompatActivity {
         edCost = findViewById(R.id.txtAmount);
         edActivity = findViewById(R.id.txtActivity);
         tBalance = findViewById(R.id.txtBalance);
-        tHistory = findViewById(R.id.txtHistory);
         btnPlus = findViewById(R.id.txtPlus);
         btnMinus = findViewById(R.id.txtMinus);
+        transTable = findViewById(R.id.table_main);
+        layoutInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
 
-        loadData();
-        updateViews();
+        myDB = new DataBaseHelper(this);
+
+        loadTable();
 
         setDateTimeField();
         edDate.setOnTouchListener(new View.OnTouchListener() {
@@ -59,30 +71,77 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         btnMinus.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
             @Override
-            public void onClick(View view) {
+            public void onClick (View view) {
+                View myView = layoutInflater.inflate(R.layout.table_row, null, false);
+
+                TextView textDate = myView.findViewById(R.id.txtTableDate);
+                TextView textAmount = myView.findViewById(R.id.txtTableAmount);
+                TextView textCategory = myView.findViewById(R.id.txtTableCategory);
+
                 double cost = Double.parseDouble(edCost.getText().toString());
-                String activity = "Spent $" + df2.format(cost) + " on " + edDate.getText().toString() + " for " + edActivity.getText().toString();
-                System.out.println(activity);
                 balance -= cost;
                 tBalance.setText(df2.format(balance));
-                tHistory.append(activity + "\n");
-                saveData();
+
+                textDate.setText(edDate.getText().toString());
+                textAmount.setText("-" + df2.format(cost));
+                textCategory.setText(edActivity.getText().toString());
+                transTable.addView(myView);
+
+
+
+                TransactionModel transaction = new TransactionModel();
+
+                transaction.mId = idCounter;
+                transaction.mDate = textDate.getText().toString();
+                transaction.mAmount = -cost;
+                transaction.mCategory = textCategory.getText().toString();
+
+                String sql = "INSERT INTO \"Transaction\" VALUES " + transaction.toSQL();
+                Log.i("SQL", sql);
+
+                myDB.insertData(transaction.mDate, transaction.mAmount, transaction.mCategory);
             }
+
         });
 
         btnPlus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                View myView = layoutInflater.inflate(R.layout.table_row, null, false);
+
+                TextView textDate = myView.findViewById(R.id.txtTableDate);
+                TextView textAmount = myView.findViewById(R.id.txtTableAmount);
+                TextView textCategory = myView.findViewById(R.id.txtTableCategory);
+
                 double cost = Double.parseDouble(edCost.getText().toString());
-                String activity = "Added $" + df2.format(cost) + " on " + edDate.getText().toString() + " from " + edActivity.getText().toString();
                 balance += cost;
                 tBalance.setText(df2.format(balance));
-                tHistory.append(activity + "\n");
-                saveData();
+
+                textDate.setText(edDate.getText().toString());
+                textAmount.setText(df2.format(balance));
+                textCategory.setText(edActivity.getText().toString());
+                transTable.addView(myView);
+
+
+
+                TransactionModel transaction = new TransactionModel();
+
+                transaction.mId = idCounter;
+                transaction.mDate = edDate.getText().toString();
+                transaction.mAmount = cost;
+                transaction.mCategory = edActivity.getText().toString();
+
+                String sql = "INSERT INTO \"Transaction\" VALUES" + transaction.toSQL();
+                Log.i("SQL", sql);
+
+                myDB.insertData(transaction.mDate, transaction.mAmount, transaction.mCategory);
             }
         });
+
     }
 
     private void setDateTimeField() {
@@ -104,37 +163,37 @@ public class MainActivity extends AppCompatActivity {
         mDatePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
     }
 
-    public void saveData() {
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putString(TEXT_HISTORY, tHistory.getText().toString());
-        editor.putString(TEXT_BALANCE, tBalance.getText().toString());
-
-        editor.apply();
-        Toast.makeText(this, "Data saved", Toast.LENGTH_SHORT);
-    }
-
-    public void loadData() {
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        textBal = sharedPreferences.getString(TEXT_BALANCE, "0.00");
-        textHis = sharedPreferences.getString(TEXT_HISTORY, "");
-        if (textHis.length() > 0) {
-            textHis = textHis.trim() + "\n";
+    public void loadTable() {
+        Cursor res = myDB.getAllData();
+        if (res.getCount() == 0) {
+            Log.i("Database Empty", "Database has no records");
+            return;
         }
-        balance = Double.parseDouble(textBal);
+
+        while (res.moveToNext()) {
+            View myView = layoutInflater.inflate(R.layout.table_row, null, false);
+
+            TextView textDate = myView.findViewById(R.id.txtTableDate);
+            TextView textAmount = myView.findViewById(R.id.txtTableAmount);
+            TextView textCategory = myView.findViewById(R.id.txtTableCategory);
+
+            double cost = res.getDouble(2);
+            balance += cost;
+            String costS = df2.format(cost);
+
+            textDate.setText(res.getString(1));
+            textAmount.setText(costS);
+            textCategory.setText(res.getString(3));
+            transTable.addView(myView);
+
+        }
+
+        tBalance.setText(df2.format(balance));
 
     }
 
-    public void updateViews() {
-        tHistory.setText(textHis);
-        tBalance.setText(textBal);
-    }
 
-    public void clear() {
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        sharedPreferences.edit().clear().commit();
-    }
+
 
 
 

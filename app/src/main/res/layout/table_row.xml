@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+        android:background="@drawable/back"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+    <TextView
+            android:background="@drawable/back"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:text="Date"
+            android:id="@+id/txtTableDate"
+            android:gravity="center"
+    />
+    <TextView
+            android:background="@drawable/back"
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:text="Amount"
+            android:id="@+id/txtTableAmount"
+            android:gravity="center"
+
+    />
+    <TextView
+            android:background="@drawable/back"
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            android:text="Category"
+            android:id="@+id/txtTableCategory"
+            android:gravity="center"
+    />
+</TableRow>

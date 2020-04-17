@@ -61,5 +61,35 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         Cursor res = db.rawQuery("select * from "+TABLE_NAME,null);
         return res;
     }
-    
+
+    public Cursor getSelectedData(String startDate, String endDate, Double minPrice, Double maxPrice) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("select * from "+TABLE_NAME + " WHERE " + COL_2 +
+                " BETWEEN '" + startDate + "' AND '" +  endDate + "'" + " AND " +
+                COL_3 + " >= " + minPrice + " AND " + COL_3 + " <= " + maxPrice,null);
+        return res;
+    }
+
+    public Cursor getSelectedData(String startDate, String endDate, Double minPrice, Double maxPrice, Double negMin, Double negMax) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("select * from "+TABLE_NAME + " WHERE " + COL_2 +
+                " BETWEEN '" + startDate + "' AND '" +  endDate + "'" + " AND ((" +
+                COL_3 + " >= " + minPrice  + " AND " + COL_3 + " <= " + maxPrice + ") OR (" + COL_3 + " >= " + negMax + " AND " + COL_3 + " <=" + negMin + "))",null);
+        return res;
+    }
+
+    public Cursor getSelectedData(Double minPrice, Double maxPrice) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("select * from "+TABLE_NAME + " WHERE " +
+                COL_3 + " >= " + minPrice + " AND " + COL_3 + " <= " + maxPrice,null);
+        return res;
+    }
+
+    public Cursor getSelectedData(Double minPrice, Double maxPrice, Double negMin, Double negMax) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("select * from "+TABLE_NAME + " WHERE " + COL_3 + " >= " + minPrice + " AND " +
+                COL_3 + " <= " + maxPrice + " OR " + COL_3 + " >= " + negMax + " AND " + COL_3 + " <=" + negMin,null);
+        return res;
+    }
+
 }

@@ -4,6 +4,7 @@ package com.example.budgettracker;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -33,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private static DecimalFormat df2 = new DecimalFormat("0.00");
     private TextView tBalance, tHistory;
     private EditText edDate, edCost, edActivity;
-    private Button btnPlus, btnMinus;
+    private Button btnPlus, btnMinus, btnSearch;
     private double balance;
     private String textBal, textHis;
     private TableLayout transTable;
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         btnPlus = findViewById(R.id.txtPlus);
         btnMinus = findViewById(R.id.txtMinus);
         transTable = findViewById(R.id.table_main);
+        btnSearch = findViewById(R.id.btnSearch);
         layoutInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
 
         myDB = new DataBaseHelper(this);
@@ -122,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
                 tBalance.setText(df2.format(balance));
 
                 textDate.setText(edDate.getText().toString());
-                textAmount.setText(df2.format(balance));
+                textAmount.setText(df2.format(cost));
                 textCategory.setText(edActivity.getText().toString());
                 transTable.addView(myView);
 
@@ -142,6 +144,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        btnSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, Search.class));
+            }
+        });
+
     }
 
     private void setDateTimeField() {
@@ -152,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 Calendar newDate = Calendar.getInstance();
                 newDate.set(year, monthOfYear, dayOfMonth);
-                SimpleDateFormat sd = new SimpleDateFormat("MM-dd-yyyy");
+                SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd");
                 final Date startDate = newDate.getTime();
                 String fdate = sd.format(startDate);
 
